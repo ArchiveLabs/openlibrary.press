@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Openlibrary.press</title>
+  <link rel="manifest" href="/static/manifest.json">
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/index.css">
+  <script src="/static/js/index.js" defer></script>
+
+</head>
+<body class="bg-gray-50 text-gray-900 font-sans">
+  <header class="bg-white shadow sticky top-0 z-10">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+      <h1 class="text-xl font-bold text-indigo-700">OpenLibrary.press</h1>
+      <nav class="space-x-4 text-sm">
+        <a href="#" class="text-gray-600 hover:text-indigo-700">Discover</a>
+        <a href="#" class="text-gray-600 hover:text-indigo-700">Borrow</a>
+        <a href="#" class="text-gray-600 hover:text-indigo-700">Buy</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-4 py-6">
+    <!-- Hero -->
+    <section class="text-center py-12">
+      <h2 class="text-3xl font-bold mb-4">Ideas Worth Owning, Borrowing, and Sharing</h2>
+      <p class="text-gray-600 max-w-xl mx-auto">A curated platform for exploring timeless books. Borrow or buy, always DRM-free.</p>
+    </section>
+
+    <!-- Book Grid -->
+    <section aria-labelledby="collection-heading">
+      <h2 id="collection-heading" class="text-xl font-semibold mb-4">Featured Books</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        <!-- Book Card -->
+        <article class="bg-white rounded-xl shadow-md overflow-hidden">
+          <a href="#" class="block">
+            <img id="book-cover" src="https://via.placeholder.com/150x200?text=Loading" alt="Book cover" class="w-full h-48 object-cover">
+            <div class="p-4">
+              <h3 id="book-title" class="text-md font-semibold">Loading title...</h3>
+              <p id="book-author" class="text-sm text-gray-600">Loading author...</p>
+              <p id="publish-date" class="text-sm text-gray-500 mt-1">Loading date...</p>
+              <p id="publisher" class="text-sm text-gray-500">Loading publisher...</p>
+              <div class="mt-3 flex gap-2">
+                <button class="text-xs bg-indigo-600 text-white px-2 py-1 rounded">Borrow</button>
+                <button class="text-xs border border-indigo-600 text-indigo-600 px-2 py-1 rounded">Buy</button>
+              </div>
+            </div>
+          </a>
+        </article>
+      </div>
+    </section>
+  </main>
+  
+  <footer class="text-center text-xs text-gray-500 p-6">
+    &copy; 2025 OpenLibrary.press — Made for readers everywhere.
+  </footer>
+
+  
+  <!-- Minimal PWA Script -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/static/sw.js')
+          .then(reg => console.log('Service Worker registered:', reg))
+          .catch(err => console.log('Service Worker registration failed:', err));
+      });
+    }
+  </script>
+
+</body>
+</html>
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#ffffff" />
+  <link rel="manifest" href="/static/manifest.json" />
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+  <title>OpenLibrary.press</title>
+</head>
+
+
+
+
+
+
+
+</body>
+</html>

@@ -1,0 +1,14 @@
+services:
+
+  olp:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    container_name: openlibrary-press
+    ports:
+      - "8080:80"
+    env_file: olp.env
+    environment:
+      - OLP_PORT=1337
+    volumes:
+      - .:/app
