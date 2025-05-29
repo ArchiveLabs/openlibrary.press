@@ -10,6 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
 
+      // Set display info (if you want)
       document.getElementById("book-title").textContent = edition.title || "Unknown Title";
       document.getElementById("book-author").textContent = edition.author_name?.join(", ") || "Unknown Author";
       document.getElementById("publish-date").textContent = edition.publish_date?.[0] || "Unknown";
@@ -22,10 +23,31 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById("book-cover").src = "https://via.placeholder.com/150x200?text=No+Cover";
       }
 
-      document.getElementById("description").textContent = description || "No description available.";
+      // Form inputs update
+      const nameInput = document.getElementById("name");
+      const priceInput = document.getElementById("price");
+      const itemInput = document.getElementById("item");
+      const filenameInput = document.getElementById("filename");
+
+      // Name = title + " (digital book)"
+      const title = edition.title || "Unknown Title";
+      nameInput.value = `${title} (digital book)`;
+
+      // Price: if unknown, default to "250"
+      // Let's assume edition.price or edition.price_amount exists, otherwise fallback
+      // Since Open Library data usually does not have price, we default to 250
+      priceInput.value = "250";
+
+      // Item = ia identifier (Internet Archive identifier)
+      // edition.ia is the common property for IA identifier, fallback to empty string if missing
+      itemInput.value = edition.ia || "";
+
+      // Filename: default to "the-quintet_text.pdf"
+      // or use first available format file from edition.formats (if available)
+      // But Open Library editions usually do not have formats info here, so just default
+      filenameInput.value = "quintet_text.pdf";
     })
     .catch(err => {
       console.error("Error fetching book data:", err);
     });
 });
-

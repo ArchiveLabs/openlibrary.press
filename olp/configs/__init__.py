@@ -8,13 +8,20 @@
 """
 
 import os
+import dotenv
+from pathlib import Path
+import stripe
+from dotenv import load_dotenv
 
+project_root = Path(__file__).resolve().parents[2]  # two levels up from __init__.py
+env_path = project_root / 'olp.env'
+load_dotenv(dotenv_path=env_path)
 
 # Determine environment
 TESTING = os.getenv("TESTING", "false").lower() == "true"
 
 # API server configuration
-DOMAIN = os.environ.get('OLP_DOMAIN', '127.0.0.1')
+DOMAIN = os.environ.get('OLP_DOMAIN', 'http://127.0.0.1')
 HOST = os.environ.get('OLP_HOST', '0.0.0.0')
 PORT = int(os.environ.get('OLP_PORT', 8080))
 WORKERS = int(os.environ.get('OLP_WORKERS', 1))
@@ -35,5 +42,11 @@ if SSL_CRT and SSL_KEY:
     OPTIONS['ssl_keyfile'] = SSL_KEY
     OPTIONS['ssl_certfile'] = SSL_CRT
 
+stripe.api_key = os.getenv('STRIPE_SECRET_KEY')
+
+IA_S3_KEYS = {
+    "access": os.getenv('IA_ACCESS_KEY'),
+    "secret": os.getenv('IA_SECRET_KEY')
+}
 
 __all__ = ['DOMAIN', 'HOST', 'PORT', 'DEBUG', 'OPTIONS', 'TESTING']
