@@ -6,7 +6,7 @@ from fastapi.responses import HTMLResponse, RedirectResponse, StreamingResponse
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from io import BytesIO
-from olp.configs import OPTIONS, DOMAIN, PORT
+from olp.configs import OPTIONS, DOMAIN
 from olp import __version__ as VERSION
 from olp import apis
 
@@ -33,7 +33,7 @@ async def home(request: Request):
 @app.post("/checkout")
 async def checkout(name: str = Form(...), item: str = Form(...), filename: str = Form(...), price: str = Form(...)):
     try:
-        checkout_session = apis.stripe_create_payment(f"{DOMAIN}:{PORT}", name, price, item, filename)
+        checkout_session = apis.stripe_create_payment(DOMAIN, name, price, item, filename)
         return RedirectResponse(checkout_session.url, status_code=303)
     except Exception as e:
         return {"error": str(e)}

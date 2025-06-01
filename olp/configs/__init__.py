@@ -21,9 +21,9 @@ load_dotenv(dotenv_path=env_path)
 TESTING = os.getenv("TESTING", "false").lower() == "true"
 
 # API server configuration
-DOMAIN = os.environ.get('OLP_DOMAIN', 'http://127.0.0.1')
 HOST = os.environ.get('OLP_HOST', '0.0.0.0')
 PORT = int(os.environ.get('OLP_PORT', 8080))
+DOMAIN = os.environ.get('OLP_DOMAIN', f'http://127.0.0.1:{PORT}')
 WORKERS = int(os.environ.get('OLP_WORKERS', 1))
 DEBUG = bool(int(os.environ.get('OLP_DEBUG', 0)))
 
