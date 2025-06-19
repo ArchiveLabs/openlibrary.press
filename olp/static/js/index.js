@@ -23,10 +23,13 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById("book-cover").src = "https://via.placeholder.com/150x200?text=No+Cover";
       }
 
+      document.getElementsByClassName("bookpage")[0].href= `https://openlibrary.org${edition.key}`;
+
       // Form inputs update
       const nameInput = document.getElementById("name");
       const priceInput = document.getElementById("price");
       const itemInput = document.getElementById("item");
+      const olidInput = document.getElementById("olid");
       const filenameInput = document.getElementById("filename");
 
       // Name = title + " (digital book)"
@@ -42,12 +45,24 @@ document.addEventListener('DOMContentLoaded', () => {
       // edition.ia is the common property for IA identifier, fallback to empty string if missing
       itemInput.value = edition.ia || "";
 
-      // Filename: default to "the-quintet_text.pdf"
-      // or use first available format file from edition.formats (if available)
-      // But Open Library editions usually do not have formats info here, so just default
-      filenameInput.value = "quintet_text.pdf";
+      // Set the olid
+      olidInput.value = edition.key.match(/OL(\d+)M/)?.[1];
     })
     .catch(err => {
       console.error("Error fetching book data:", err);
     });
+
+document.getElementById('borrowButton').addEventListener('click', () => {
+  const iaId = document.getElementById("item").value;
+  if (iaId) {
+    const iframeSrc = `https://archive.org/details/${iaId}?view=theater&wrapper=true`;
+    document.getElementById("borrowIframe").src = iframeSrc;
+    document.getElementById("borrowModal").classList.remove("hidden");
+  }
+});
+
+document.getElementById('closeModal').addEventListener('click', () => {
+  document.getElementById("borrowModal").classList.add("hidden");
+  document.getElementById("borrowIframe").src = "";
+});
 });

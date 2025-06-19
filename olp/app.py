@@ -27,13 +27,22 @@ templates = Jinja2Templates(directory=resolve("templates"))
 async def home(request: Request):
     return templates.TemplateResponse("index.html", {
         "request": request,
-        "appname": "OpenLibrary.press"
+        "appname": "OpenLibrary.press",
     })
 
 @app.post("/checkout")
-async def checkout(name: str = Form(...), item: str = Form(...), filename: str = Form(...), price: str = Form(...)):
+async def checkout(
+        name: str = Form(...),
+        olid: str = Form(...),
+        item: str = Form(...),
+        price: str = Form(...),
+):
+    callback_url = request.headers.get("X-Lenny-Callback")
     try:
-        checkout_session = apis.stripe_create_payment(DOMAIN, name, price, item, filename)
+        checkout_session = apis.stripe_create_payment(
+            DOMAIN, name, price, item, olid,
+            callback_url=callback_url
+        )
         return RedirectResponse(checkout_session.url, status_code=303)
     except Exception as e:
         return {"error": str(e)}
@@ -42,14 +51,23 @@ async def checkout(name: str = Form(...), item: str = Form(...), filename: str =
 async def success(session_id: str = Query(...)):
     try:
         tx = apis.stripe_fulfill(session_id)
-        item, filename = tx.metadata.get('item'), tx.metadata.get('filename')
+        item = tx.metadata.get('item')
+        olid = tx.metadata.get('olid')
+        callback_url = tx.metadata.get('callback_url')
+
+        epub = apis.download_book(item)
+
+        if callback_url and callback_url.startswith('http'):
+            apis.Lenny.upload(callback_url, olid, epub)
+            return RedirectResponse(apis.Lenny.redirect(callback_url), status_code=303)
+        
         # Return PDF as downloadable file
         return StreamingResponse(
-            content=apis.download_book(item, filename),
-            media_type='application/pdf',
+            content=epub,
+            media_type='application/epub+zip',
             headers={
                 "Content-Disposition":
-                f"attachment; filename={filename}"
+                f"attachment; filename={olid}.epub"
             }
         )
     except Exception as e:

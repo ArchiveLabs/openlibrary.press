@@ -1,29 +1,61 @@
 
 import stripe
+import re
 import requests
 from io import BytesIO
+from urllib.parse import urlparse
 from internetarchive import session
 from internetarchive import get_session
 from olp.configs import IA_S3_KEYS
 
-def download_book(item, filename):
+def download_book(item, formats=("epub",)):
     # Prevent BytesIO from being closed
     class UnclosableBytesIO(BytesIO):
         def close(self):
             pass  # override close to do nothing
-    
     s = get_session({'s3': IA_S3_KEYS})
     book = s.get_item(item)
-    file_obj = book.get_file(filename)
-    file_stream = UnclosableBytesIO()
-    success = file_obj.download(fileobj=file_stream)
+    for fmt in formats:
+        filename_generator = (
+            file['name'] for file in book.files
+            if file['name'].lower().endswith(f".{fmt}")
+        )
+        if (filename := next(filename_generator, None)):
+            file_obj = book.get_file(filename)
+            file_stream = UnclosableBytesIO()
+            if file_obj.download(fileobj=file_stream):
+                file_stream.seek(0)
+                return file_stream
+            raise IOError(f"Download failed for {item}/{filename}")
+    raise IOError(f"No files available for download")
 
-    if not success:
-        raise IOError(f"Download failed for {item_id}/{filename}")
+class Lenny:
+    @classmethod
+    def redirect(cls, callback_url):
+        return f"{urlparse(callback_url).path}/read/{olid}"
 
-    file_stream.seek(0)
-    return file_stream
-
+    @classmethod
+    def upload(cls, callback_url: str, olid: str, file_content: BytesIO, encrypted: bool=True):
+        match = re.search(r"(?:OL)?(\d+)[A-Z]?", olid, re.IGNORECASE)
+        olid = match.group(1) if match else olid
+        data_payload = {
+            'openlibrary_edition': olid,
+            'encrypted': str(encrypted).lower()
+        }
+        files_payload = {
+            'file': ('book.epub', file_content, 'application/epub+zip')
+        }
+        response = requests.post(
+            callback_url,
+            data=data_payload,
+            files=files_payload,
+            timeout=120,
+            verify=False
+        )
+        file_content.seek(0) # make sure stream position rewound to start
+        logger.info(f"Upload response (OLID: {olid}): {response.content}")
+        response.raise_for_status()
+        return response
 
 def stripe_fulfill(session_id):
     session = stripe.checkout.Session.retrieve(session_id)
@@ -31,7 +63,7 @@ def stripe_fulfill(session_id):
         raise HTTPException(status_code=403, detail="Payment not completed")
     return session
 
-def stripe_create_payment(domain, name, price, item, filename):
+def stripe_create_payment(domain, name, price, item, olid, callback_url=None):
     return stripe.checkout.Session.create(
         line_items=[
             {
@@ -50,7 +82,7 @@ def stripe_create_payment(domain, name, price, item, filename):
         cancel_url=f"{domain}/",
         metadata={
             "item": item,
-            "filename": filename,
+            "olid": olid,
+            "callback_url": callback_url or "",
         }
     )    
-
