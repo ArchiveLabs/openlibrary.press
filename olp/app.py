@@ -38,6 +38,7 @@ async def checkout(
         price: str = Form(...),
 ):
     callback_url = request.headers.get("X-Lenny-Callback")
+
     try:
         checkout_session = apis.stripe_create_payment(
             DOMAIN, name, price, item, olid,
