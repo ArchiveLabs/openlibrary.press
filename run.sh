@@ -13,6 +13,6 @@ if [[ "$1" == "--dev" ]]; then
     uvicorn olp.app:app --reload
 else
     echo "Running in production mode..."
-    export $(grep -v '^#' .env | xargs)
+    export $(grep -v '^#' olp.env | xargs)
     APT_MIRROR="$APT_MIRROR" PIP_INDEX_URL="$PIP_INDEX_URL" docker compose -p olp up -d
 fi
